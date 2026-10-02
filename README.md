@@ -3,13 +3,13 @@
 Async IRC bot for EFnet that answers channel and private queries through the xAI API.
 
 **Author:** foctober
-**Version:** 4.0.0
+**Version:** 4.0.1
 
 It connects with TLS, answers `GrokBot:` and `!grok`, keeps a short channel memory, rate-limits so EFnet does not flood-kick it, and reconnects on its own.
 
 ## What it does
 
-- Joins a channel and answers `GrokBot: ...`, `GrokBot, ...`, and `!grok ...`
+- Joins one or more channels and answers `GrokBot: ...`, `GrokBot, ...`, and `!grok ...`
 - Also answers private messages
 - Replies to EFnet proxy-monitor CTCP VERSION / PING (the drones on connect)
 - Falls back to an alt nick if `GrokBot` is taken (EFnet nick length is 9)
@@ -96,7 +96,7 @@ Empty `GrokBot:` gets a nudge to ask something. Similar questions within the cac
 | `IRC_PORT` | `6697` | TLS port. Do not point TLS at 6667 |
 | `IRC_USE_TLS` | `1` | Set `0` only for a plain port |
 | `IRC_NICK` | `GrokBot` | 9 characters max on EFnet |
-| `IRC_CHANNEL` | `#crackheads` | Joined after the welcome numeric |
+| `IRC_CHANNEL` | `#crackheads` | Comma-separated channels, joined after welcome |
 | `FLOOD_DELAY` | `0.7` | Seconds between outgoing lines |
 | `MAX_REPLY_LINES` | `6` | Hard cap so a long answer cannot flood |
 | `HISTORY_TURNS` | `4` | Recent Q/A pairs sent back as context |

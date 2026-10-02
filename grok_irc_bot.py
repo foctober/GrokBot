@@ -33,7 +33,7 @@ import aiohttp
 from dotenv import load_dotenv
 
 __author__ = "foctober"
-__version__ = "4.0.0"
+__version__ = "4.0.1"
 
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
@@ -45,7 +45,11 @@ IRC_NICK = os.getenv("IRC_NICK", "GrokBot")
 IRC_ALT_NICK = os.getenv("IRC_ALT_NICK", IRC_NICK + "_")
 IRC_USER = os.getenv("IRC_USER", "grokbot")
 IRC_REALNAME = os.getenv("IRC_REALNAME", "Grok IRC Bot by foctober")
-IRC_CHANNEL = os.getenv("IRC_CHANNEL", "#crackheads")
+IRC_CHANNELS = [
+    part.strip()
+    for part in os.getenv("IRC_CHANNEL", "#crackheads").split(",")
+    if part.strip()
+]
 USE_TLS = os.getenv("IRC_USE_TLS", "1").lower() not in ("0", "false", "no")
 
 XAI_API_KEY = os.getenv("XAI_API_KEY", "")
@@ -184,7 +188,7 @@ class AsyncIRCBot:
         self.alt_nick = IRC_ALT_NICK
         self.user = IRC_USER
         self.realname = IRC_REALNAME
-        self.channel = IRC_CHANNEL
+        self.channels = IRC_CHANNELS
         self.use_tls = USE_TLS
 
         self.reader: asyncio.StreamReader | None = None
@@ -302,8 +306,10 @@ class AsyncIRCBot:
             return
 
         if cmd == "001":
-            await self.send_raw(f"JOIN {self.channel}")
-            log.info("Registered as %s, joining %s", self.nick, self.channel)
+            log.info("Registered as %s, joining %s", self.nick, ", ".join(self.channels))
+            for channel in self.channels:
+                await self.send_raw(f"JOIN {channel}")
+                await asyncio.sleep(0.4)
             return
 
         if cmd == "433":
@@ -346,7 +352,13 @@ class AsyncIRCBot:
         query = self.extract_query(message, addressed_ok=is_pm)
         if query is None:
             return
-        reply_to = sender if is_pm else self.channel
+        if is_pm:
+            reply_to = sender
+        else:
+            allowed = {c.lower() for c in self.channels}
+            if target.lower() not in allowed:
+                return
+            reply_to = target
         if not query:
             await self.enqueue(reply_to, f"{sender}: ask me something.")
             return
