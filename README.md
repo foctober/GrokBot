@@ -24,7 +24,7 @@ It connects with TLS, answers `GrokBot:` and `!grok`, keeps a short channel memo
 Python 3.10 or newer. An xAI API key from [console.x.ai](https://console.x.ai/).
 
 ```bash
-git clone https://github.com/foctober/grok-irc-bot.git
+git clone https://github.com/foctober/GrokBot.git
 cd grok-irc-bot
 python3 -m venv .venv
 source .venv/bin/activate
